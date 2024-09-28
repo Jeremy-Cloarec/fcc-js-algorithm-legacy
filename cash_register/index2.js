@@ -22,48 +22,15 @@ function checkCashRegister(price, cash, cid) {
 
             chooseMoney(restParam)
 
-            // check minimum device to give
-            function chooseMoney(restParam) {
-                for (const conv in conversion) {
-                    if (restParam >= conversion[conv]) {
-                        console.log(conv, conversion[conv])
-                        
-                        const amountDevise = checkInCid(conv)
-                        console.log("amountdevise: " + amountDevise)
-                        console.log("restParam: " + restParam);
-
-                        if (amountDevise > restParam) {
-                            const restAmountDevise = substractCID(amountDevise, restParam)
-                            console.log(amountDevise + "-" + restParam);
-                            console.log("restAmountDevise: " + restAmountDevise)
-
-                            //here push the the new value in the array after substract
-                            updatedCid(cid, conv, restAmountDevise)
-                            console.log("newArray: " + cid)
-
-                            rest -= conversion[conv]
-                            break;
-
-                        } else {
-                            console.log("oups");
-                            return
-                        }
-                    }
-                }
-            }
+            //check conversation object to see what devise is ok
+            //check the array to see if the devise in cash is enought for the rest sum
+            //if it is not, go to the next device, etc
 
             //check the amount of these devise in the cid
             function checkInCid(devise) {
                 for (const c of cid) {
                     if (c[0] === devise) {
                         return c[1]
-                    }
-                }
-            }
-            function checkInCidAfter(arrayCid, devise, index) {
-                for(let i = 0; i < arrayCid.length; i++ ) {
-                    if (arrayCid[i][0] === devise) {
-                        return
                     }
                 }
             }
