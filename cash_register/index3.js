@@ -32,8 +32,14 @@ function checkCashRegister(price, cash, cid) {
         checkInCid[1] -= conversionToUse[1]
 
         response.change.push(conversionToUse[1])  
-        
+
         response.change[1] += conversionToUse[1]   
+
+        if(response.change[1]){
+            console.log(true);
+        } else {
+            console.log(false);
+        }
 
         console.log(checkInCid);
         console.log(conversionToUse)
