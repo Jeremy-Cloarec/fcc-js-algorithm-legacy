@@ -2,6 +2,7 @@ function checkCashRegister(price, cash, cid) {
     //calculate rest
     let rest = cash - price
     console.log("begin rest: " + rest);
+    let stop = 0
 
     //object with conversion
     const conversion = [
@@ -20,40 +21,66 @@ function checkCashRegister(price, cash, cid) {
     response.statut = "OPEN"
     response.change = []
 
-    if (rest === 0) {
-        return response
-    } else {
-        const conversionToUse = conversion.reverse().find((ele => ele[1] <= rest))
+    let conversionToUse = conversion.reverse().find((ele => ele[1] <= rest))
+    let checkInCid = cid.find(ele => ele[0] === conversionToUse[0])
 
-        response.change = [...[conversionToUse[0]]]
-        let checkInCid = cid.find(ele => ele[0] === conversionToUse[0])
-
-        rest -= conversionToUse[1]
-        checkInCid[1] -= conversionToUse[1]
-
-        response.change.push(conversionToUse[1])  
-
-        response.change[1] += conversionToUse[1]   
-
-        if(response.change[1]){
-            console.log(true);
+    function recursiveCid() {
+        if (rest === 0) {
+            return response
         } else {
-            console.log(false);
+
+            if (rest - conversionToUse[1] >= 0) {
+                rest -= conversionToUse[1]
+            }
+
+            if (checkInCid[1] - conversionToUse[1] >= 0) {
+                checkInCid[1] -= conversionToUse[1]
+            } else {
+                //find the way to pass to the next devise
+                console.log("not enought");
+
+                for (let i = 0; i < conversion.length; i++) {
+                    if(conversion[i][0] === checkInCid[0] ){
+                        console.log("new boucle");
+                        conversionToUse = conversion[i + 1]
+                    }
+                    console.log(conversionToUse);
+                }
+            }
+
+            if (!response.change[1]) {
+                response.change = [...[conversionToUse[0]]]
+                response.change.push(conversionToUse[1])
+                console.log(true);
+            } else {
+                response.change[1] += conversionToUse[1]
+                console.log(false);
+            }
+
+            console.log(conversionToUse)
+            console.log(checkInCid)
+            console.log(rest);
+
+            stop++
+
+            if (stop === 15) {
+                return
+            }
+
+
+            recursiveCid()
         }
-
-        console.log(checkInCid);
-        console.log(conversionToUse)
-        console.log(checkInCid)
-        console.log(rest);
-
     }
+    recursiveCid()
+
     console.log(response);
     return response
-
-
-
 }
 
-checkCashRegister(19.5, 20, [["PENNY", 1.01], ["NICKEL", 2.05], ["DIME", 3.1], ["QUARTER", 4.25], ["ONE", 90], ["FIVE", 55], ["TEN", 20], ["TWENTY", 60], ["ONE HUNDRED", 100]]);
+// checkCashRegister(19.5, 20, [["PENNY", 1.01], ["NICKEL", 2.05], ["DIME", 3.1], ["QUARTER", 4.25], ["ONE", 90], ["FIVE", 55], ["TEN", 20], ["TWENTY", 60], ["ONE HUNDRED", 100]]);
 
 //{status: "OPEN", change: [["QUARTER", 0.5]]}.
+
+checkCashRegister(3.26, 100, [["PENNY", 1.01], ["NICKEL", 2.05], ["DIME", 3.1], ["QUARTER", 4.25], ["ONE", 90], ["FIVE", 55], ["TEN", 20], ["TWENTY", 60], ["ONE HUNDRED", 100]])
+
+// {status: "OPEN", change: [["TWENTY", 60], ["TEN", 20], ["FIVE", 15], ["ONE", 1], ["QUARTER", 0.5], ["DIME", 0.2], ["PENNY", 0.04]]}.
