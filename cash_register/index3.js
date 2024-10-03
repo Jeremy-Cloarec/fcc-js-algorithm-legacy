@@ -2,9 +2,9 @@ function checkCashRegister(price, cash, cid) {
     //calculate rest
     let rest = cash - price
     console.log("begin rest: " + rest);
-    let stop = 0
 
-    //object with conversion
+
+    //array with conversion
     const conversion = [
         ["PENNY", 0.01],
         ["NICKEL", 0.05],
@@ -14,70 +14,115 @@ function checkCashRegister(price, cash, cid) {
         ["FIVE", 5],
         ["TEN", 10],
         ["TWENTY", 20],
-        ["HUNDRED", 100],
+        ["ONE HUNDRED", 100],
     ]
 
     const response = {}
     response.statut = "OPEN"
     response.change = []
+    let usingDevises = []
 
     let conversionToUse = conversion.reverse().find((ele => ele[1] <= rest))
-    let checkInCid = cid.find(ele => ele[0] === conversionToUse[0])
 
     function recursiveCid() {
-        if (rest === 0) {
+
+        console.log("conversion to use at begining of the recursive function: " + conversionToUse);
+        console.log("rest at begining of the recursive function: " + rest);
+        console.log("");
+
+        //out of the recursive function
+        if (rest <= 0) {
+            console.log("go out of the function");
             return response
-        } else {
+        }
+        //substract the devise in cid with the devise
+        let checkInCid = cid.find(ele => ele[0] === conversionToUse[0])
+        console.log("checkInCId at begining of the recursive function: " + checkInCid);
 
-            if (rest - conversionToUse[1] >= 0) {
-                rest -= conversionToUse[1]
-            }
+        if (checkInCid[1] - conversionToUse[1] < 0 || rest - conversionToUse[1] < 0) {
+            //find the way to pass to the next devise in conversion and in cid
+            console.log("not enought");
+            console.log("");
 
-            if (checkInCid[1] - conversionToUse[1] >= 0) {
-                checkInCid[1] -= conversionToUse[1]
-            } else {
-                //find the way to pass to the next devise
-                console.log("not enought");
+            for (let i = 0; i < conversion.length; i++) {
 
-                for (let i = 0; i < conversion.length; i++) {
-                    if(conversion[i][0] === checkInCid[0] ){
-                        console.log("new boucle");
-                        conversionToUse = conversion[i + 1]
-                    }
-                    console.log(conversionToUse);
+                let cidReverse = [...cid].reverse()
+                console.log(rest);
+                if (conversion[i][1] <= rest && cidReverse[i][1] != 0) {
+                    console.log(cidReverse[i]);
+                    console.log("new devise");
+                    console.log(conversion[i]);
+                    console.log("cidReverse");
+                    console.log(cidReverse);
+                    console.log("conversion");
+                    console.log(conversion);
+
+                    conversionToUse = conversion[i]
+                    break
                 }
             }
+        }
 
-            if (!response.change[1]) {
-                response.change = [...[conversionToUse[0]]]
-                response.change.push(conversionToUse[1])
-                console.log(true);
-            } else {
-                response.change[1] += conversionToUse[1]
-                console.log(false);
-            }
 
-            console.log(conversionToUse)
-            console.log(checkInCid)
+        if (checkInCid[1] - conversionToUse[1] >= 0) {
+            console.log("enought in the cid :" + checkInCid[1] + " - " + conversionToUse[1])
+            console.log("______________");
+            console.log(conversionToUse);
+            console.log(checkInCid);
+            console.log("______________");
+            console.log("");
+
             console.log(rest);
 
-            stop++
 
-            if (stop === 15) {
-                return
-            }
+            checkInCid[1] -= conversionToUse[1]
+            checkInCid[1] = Math.round(checkInCid[1] * 100) / 100
+            console.log("");
 
+            console.log(`push ${conversionToUse} `);
+            usingDevises.push([...conversionToUse])
 
-            recursiveCid()
+            console.log("");
+            console.log("cid");
+            console.log(cid);
+            console.log("");
+
+            console.log("conversion to substract to the rest: " + conversionToUse[1]);
+            console.log("rest to substract to the conversion: " + rest);
+            rest -= conversionToUse[1]
+            rest = Math.round(rest * 100) / 100
+            console.log("rest just after substract: " + rest);
+
         }
-    }
-    recursiveCid()
 
+        //checkInCid = cid.find(ele => ele[0] === conversionToUse[0])
+        recursiveCid()
+
+    }
+
+    recursiveCid()
+    //reduce
+    console.log("reduce");
+
+
+    
+
+    for (let i = 0; i < usingDevises.length; i++) {
+        if (usingDevises[i - 1] && usingDevises[i - 1][0] === usingDevises[i][0]) {
+            usingDevises[i][1] += usingDevises[i - 1][1]
+            usingDevises[i - 1] = undefined
+        } 
+    }
+
+    const usingDevisesReduced = usingDevises.filter(ele => ele !== undefined )
+
+    response.change = [...usingDevisesReduced]
     console.log(response);
+   
     return response
 }
 
-// checkCashRegister(19.5, 20, [["PENNY", 1.01], ["NICKEL", 2.05], ["DIME", 3.1], ["QUARTER", 4.25], ["ONE", 90], ["FIVE", 55], ["TEN", 20], ["TWENTY", 60], ["ONE HUNDRED", 100]]);
+//checkCashRegister(19.5, 20, [["PENNY", 1.01], ["NICKEL", 2.05], ["DIME", 3.1], ["QUARTER", 4.25], ["ONE", 90], ["FIVE", 55], ["TEN", 20], ["TWENTY", 60], ["ONE HUNDRED", 100]]);
 
 //{status: "OPEN", change: [["QUARTER", 0.5]]}.
 
